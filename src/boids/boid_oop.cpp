@@ -23,8 +23,8 @@ void BoidOOP::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_alignment_weight"), &BoidOOP::get_alignment_weight);
 	ClassDB::bind_method(D_METHOD("set_cohesion_weight", "weight"), &BoidOOP::set_cohesion_weight);
 	ClassDB::bind_method(D_METHOD("get_cohesion_weight"), &BoidOOP::get_cohesion_weight);
-	ClassDB::bind_method(D_METHOD("update", "delta"), &BoidOOP::update);
-	ClassDB::bind_method(D_METHOD("find_neighbors", "boids", "neighbor_difference"), &BoidOOP::find_neighbors);
+	ClassDB::bind_method(D_METHOD("update", "delta", "boids"), &BoidOOP::update);
+	ClassDB::bind_method(D_METHOD("find_neighbors", "boids"), &BoidOOP::find_neighbors);
 
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "position"), "set_position", "get_position");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "velocity"), "set_velocity", "get_velocity");
@@ -36,18 +36,14 @@ void BoidOOP::_bind_methods() {
 }
 
 BoidOOP::BoidOOP() {
-	Ref<BoidSystem> boid_system = Ref<BoidSystem>(Engine::get_singleton()->get_singleton("BoidSystem"));
-	boid_system->register_boid(*this);
-
+	position = Vector3(0, 0, 0);
+    velocity = Vector3(0, 0, 0);
 }
-BoidOOP::~BoidOOP() {
-	Ref<BoidSystem> boid_system = Ref<BoidSystem>(Engine::get_singleton()->get_singleton("BoidSystem"));
-	boid_system->unregister_boid(*this);
-}
+BoidOOP::~BoidOOP() {}
 
 
-const std::vector<const BoidOOP*> BoidOOP::find_neighbors(const std::vector<BoidOOP*>& boids) const {
-	std::vector<const BoidOOP*> neighbors;
+const std::vector<BoidOOP*> BoidOOP::find_neighbors(const std::vector<BoidOOP*>& boids) const {
+	std::vector<BoidOOP*> neighbors;
 	int n_boids = boids.size();
 	for (int i = 0; i < n_boids; ++i) {
 		const BoidOOP* other = boids[i];
@@ -61,10 +57,8 @@ const std::vector<const BoidOOP*> BoidOOP::find_neighbors(const std::vector<Boid
 }
 
 
-void BoidOOP::update(float delta){
-	Ref<BoidSystem> boid_system = Ref<BoidSystem>(Engine::get_singleton()->get_singleton("BoidSystem"));
-	const std::vector<BoidOOP*>& boids = boid_system->get_boid_oops();
-	const std::vector<const BoidOOP*> neighbors = find_neighbors(boids);
+void BoidOOP::update(double delta, const std::vector<BoidOOP*>& boids) {
+	const std::vector<BoidOOP*> neighbors = find_neighbors(boids);
 	Vector3 separation, alignment, cohesion;
 	int neighbor_count = 0;
 	for (const BoidOOP* other : neighbors) {
@@ -87,7 +81,7 @@ void BoidOOP::update(float delta){
 	position += velocity * (float)delta;
 }
 
-void BoidOOP::set_position(const Vector3 &p_position) {
+void BoidOOP::set_position(Vector3 &p_position) {
 	position = p_position;
 }
 
@@ -95,7 +89,7 @@ Vector3 BoidOOP::get_position() const {
 	return position;
 }
 
-void BoidOOP::set_velocity(const Vector3 &p_velocity) {
+void BoidOOP::set_velocity(Vector3 &p_velocity) {
 	velocity = p_velocity;
 }
 

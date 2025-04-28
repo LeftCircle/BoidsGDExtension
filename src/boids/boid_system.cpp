@@ -26,9 +26,17 @@ void BoidSystem::register_boid(BoidOOP &boid) {
 	boid_oops.push_back(&boid);
 }
 
+void BoidSystem::unregister_boid(BoidOOP &boid) {
+	// Remove the boid from the array
+	auto it = std::remove(boid_oops.begin(), boid_oops.end(), &boid);
+	if (it != boid_oops.end()) {
+		boid_oops.erase(it, boid_oops.end());
+	}
+}
+
 void BoidSystem::update_boids_oop(double delta) {
 	for (int i = 0; i < boid_oops.size(); ++i) {
-		std::vector<const BoidOOP*> neighbors = boid_oops[i]->find_neighbors(boid_oops);
-		boid_oops[i]->update(delta);
+		const std::vector<BoidOOP*> neighbors = boid_oops[i]->find_neighbors(get_boid_oops());
+		boid_oops[i]->update(delta, neighbors);
 	}
 }

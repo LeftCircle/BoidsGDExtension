@@ -25,7 +25,7 @@ for root, dirs, files in os.walk("."):
 env.Append(CPPPATH=include_dirs)
 
 #env.Append(CPPPATH=["src/"])
-sources = Glob("src/*.cpp")
+sources = Glob("src/**/*.cpp")
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(

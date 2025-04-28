@@ -7,9 +7,12 @@
 #include <godot_cpp\variant\utility_functions.hpp>
 
 #include "boid_oop.h"
+
 #include <vector>
 
-namespace godot {	
+namespace godot {
+
+
 class BoidSystem : public Node {
 	GDCLASS(BoidSystem, Node);
 
@@ -18,8 +21,9 @@ protected:
 
 private:
 	std::vector<BoidOOP*> boid_oops;
-
+	
 public:
+	
 	BoidSystem();
 	~BoidSystem();
 

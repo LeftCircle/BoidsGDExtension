@@ -5,8 +5,6 @@
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/engine.hpp>
 
-#include "boid_system.h"
-
 
 #include <random>
 #include <vector>
@@ -14,8 +12,13 @@
 
 
 namespace godot {
+
+
 class BoidOOP : public Resource {
 	GDCLASS(BoidOOP, Resource);
+
+protected:
+	static void _bind_methods();
 
 private:
 	Vector3 position;
@@ -27,14 +30,12 @@ private:
 	float cohesion_weight = 1.0f;
 
 public:
-
-	static void _bind_methods();
 	BoidOOP();
 	~BoidOOP();
 
-	void set_position(const Vector3 &p_position);
+	void set_position(Vector3 &p_position);
 	Vector3 get_position() const;
-	void set_velocity(const Vector3 &p_velocity);
+	void set_velocity(Vector3 &p_velocity);
 	Vector3 get_velocity() const;
 	void set_max_speed(float p_max_speed);
 	float get_max_speed() const;
@@ -48,8 +49,8 @@ public:
 	float get_cohesion_weight() const;
 
 
-	const std::vector<const BoidOOP*> find_neighbors(const std::vector<BoidOOP*> &boids) const;
-	void update(float delta);
+	const std::vector<BoidOOP*> find_neighbors(const std::vector<BoidOOP*> &boids) const;
+	void update(double delta, const std::vector<BoidOOP*>& boids);
 
 	void set_boid_count(int count);
 	int get_boid_count() const;
