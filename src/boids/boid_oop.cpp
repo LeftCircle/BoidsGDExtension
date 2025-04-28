@@ -35,7 +35,11 @@ void BoidOOP::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "cohesion_weight"), "set_cohesion_weight", "get_cohesion_weight");
 }
 
-BoidOOP::BoidOOP() {}
+BoidOOP::BoidOOP() {
+	Ref<BoidSystem> boid_system = Ref<BoidSystem>(Engine::get_singleton()->get_singleton("BoidSystem"));
+	boid_system->register_boid(*this);
+
+}
 BoidOOP::~BoidOOP() {}
 
 

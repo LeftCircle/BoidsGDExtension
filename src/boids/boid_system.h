@@ -27,6 +27,7 @@ public:
 	void _process(double delta) override;
 
 	void register_boid(BoidOOP &boid);
+	void unregister_boid(BoidOOP &boid);
 
 	void update_boids_oop(double delta);
 };

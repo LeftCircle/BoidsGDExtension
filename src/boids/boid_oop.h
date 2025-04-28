@@ -3,9 +3,14 @@
 #include <godot_cpp/classes/resource.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/classes/engine.hpp>
+
+#include "boid_system.h"
+
 
 #include <random>
 #include <vector>
+
 
 
 namespace godot {
