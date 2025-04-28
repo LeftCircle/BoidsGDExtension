@@ -1,13 +1,7 @@
 #include "boid_oop.h"
 
 using namespace godot;
-// Vector3 position;
-// Vector3 velocity;
-// float max_speed = 5.0f;
-// float neighbor_distance = 5.0f;
-// float separation_weight = 1.5f;
-// float alignment_weight = 1.0f;
-// float cohesion_weight = 1.0f;
+
 void BoidOOP::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_position", "position"), &BoidOOP::set_position);
 	ClassDB::bind_method(D_METHOD("get_position"), &BoidOOP::get_position);
@@ -23,7 +17,7 @@ void BoidOOP::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_alignment_weight"), &BoidOOP::get_alignment_weight);
 	ClassDB::bind_method(D_METHOD("set_cohesion_weight", "weight"), &BoidOOP::set_cohesion_weight);
 	ClassDB::bind_method(D_METHOD("get_cohesion_weight"), &BoidOOP::get_cohesion_weight);
-	ClassDB::bind_method(D_METHOD("update", "delta", "boids"), &BoidOOP::update);
+	ClassDB::bind_method(D_METHOD("update", "delta", "neighbors"), &BoidOOP::update);
 	ClassDB::bind_method(D_METHOD("find_neighbors", "boids"), &BoidOOP::find_neighbors);
 
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "position"), "set_position", "get_position");
@@ -42,12 +36,12 @@ BoidOOP::BoidOOP() {
 BoidOOP::~BoidOOP() {}
 
 
-const std::vector<BoidOOP*> BoidOOP::find_neighbors(const std::vector<BoidOOP*>& boids) const {
-	std::vector<BoidOOP*> neighbors;
+TypedArray<BoidOOP> BoidOOP::find_neighbors(const TypedArray<BoidOOP>& boids) const {
+	TypedArray<BoidOOP> neighbors;
 	int n_boids = boids.size();
 	for (int i = 0; i < n_boids; ++i) {
-		const BoidOOP* other = boids[i];
-		if (other->get_position() == position) continue;
+		BoidOOP* other = Object::cast_to<BoidOOP>(boids[i].operator Object*());
+		if (!other || other == this) continue;
 		float dist = position.distance_to(other->get_position());
 		if (dist < neighbor_distance) {
 			neighbors.push_back(boids[i]);
@@ -57,31 +51,48 @@ const std::vector<BoidOOP*> BoidOOP::find_neighbors(const std::vector<BoidOOP*>&
 }
 
 
-void BoidOOP::update(double delta, const std::vector<BoidOOP*>& boids) {
-	const std::vector<BoidOOP*> neighbors = find_neighbors(boids);
+void BoidOOP::update(double delta, const TypedArray<BoidOOP>& neighbors) {
 	Vector3 separation, alignment, cohesion;
 	int neighbor_count = 0;
-	for (const BoidOOP* other : neighbors) {
-		if (other == this) continue;
+	int n_neighbors = neighbors.size(); // Use the passed neighbors array
+
+	for (int i = 0; i < n_neighbors; ++i) {
+			Variant v = neighbors[i];
+			BoidOOP* other = Object::cast_to<BoidOOP>(v.operator Object*());
+			if (!other) continue; // Should not happen if find_neighbors is correct
+
 		float dist = position.distance_to(other->get_position());
-		separation += (position - other->get_position()) / (dist + 0.01f);
+		// Avoid division by zero or very small distances
+		if (dist > CMP_EPSILON) {
+				separation += (position - other->get_position()).normalized() / dist; 
+		}
 		alignment += other->get_velocity();
 		cohesion += other->get_position();
 		neighbor_count++;
 	}
+
 	if (neighbor_count > 0) {
-		separation = separation / neighbor_count * separation_weight;
-		alignment = (alignment / neighbor_count - velocity) * alignment_weight;
-		cohesion = ((cohesion / neighbor_count) - position) * cohesion_weight;
+		// Average the forces/positions
+		separation /= neighbor_count;
+		alignment /= neighbor_count;
+		cohesion /= neighbor_count;
+
+		// Apply weights and calculate final vectors
+		separation *= separation_weight;
+		alignment = (alignment - velocity).normalized() * alignment_weight; 
+		cohesion = (cohesion - position).normalized() * cohesion_weight;
+
 		velocity += separation + alignment + cohesion;
 	}
-	if (velocity.length() > max_speed) {
+
+	// Clamp speed
+	if (velocity.length_squared() > max_speed * max_speed) {
 		velocity = velocity.normalized() * max_speed;
 	}
 	position += velocity * (float)delta;
 }
 
-void BoidOOP::set_position(Vector3 &p_position) {
+void BoidOOP::set_position(const Vector3 &p_position) {
 	position = p_position;
 }
 
@@ -89,7 +100,7 @@ Vector3 BoidOOP::get_position() const {
 	return position;
 }
 
-void BoidOOP::set_velocity(Vector3 &p_velocity) {
+void BoidOOP::set_velocity(const Vector3 &p_velocity) {
 	velocity = p_velocity;
 }
 

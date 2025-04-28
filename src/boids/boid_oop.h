@@ -4,6 +4,8 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/templates/vector.hpp> 
+#include <godot_cpp/variant/typed_array.hpp>
 
 
 #include <random>
@@ -33,9 +35,9 @@ public:
 	BoidOOP();
 	~BoidOOP();
 
-	void set_position(Vector3 &p_position);
+	void set_position(const Vector3 &p_position);
 	Vector3 get_position() const;
-	void set_velocity(Vector3 &p_velocity);
+	void set_velocity(const Vector3 &p_velocity);
 	Vector3 get_velocity() const;
 	void set_max_speed(float p_max_speed);
 	float get_max_speed() const;
@@ -49,10 +51,7 @@ public:
 	float get_cohesion_weight() const;
 
 
-	const std::vector<BoidOOP*> find_neighbors(const std::vector<BoidOOP*> &boids) const;
-	void update(double delta, const std::vector<BoidOOP*>& boids);
-
-	void set_boid_count(int count);
-	int get_boid_count() const;
+	TypedArray<BoidOOP> find_neighbors(const TypedArray<BoidOOP> &boids) const;
+	void update(double delta, const const TypedArray<BoidOOP> &neighbors);
 };
 } // namespace godot
