@@ -1,6 +1,7 @@
 #include "register_types.h"
 
 #include "gdexample.h"
+#include "boids/boids.h"
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
@@ -45,6 +46,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level) {
 	// Can also use if (Engine->get_singleton()->is_editor_hint()) to isolate editor code.
 	//GDREGISTER_RUNTIME_CLASS(Player);
 	GDREGISTER_RUNTIME_CLASS(GDExample);
+	GDREGISTER_RUNTIME_CLASS(Boids);
 }
 
 void uninitialize_gdextension_types(ModuleInitializationLevel p_level) {

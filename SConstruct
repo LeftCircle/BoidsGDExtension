@@ -13,7 +13,18 @@ env = SConscript("godot-cpp/SConstruct")
 # - LINKFLAGS are for linking flags
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
-env.Append(CPPPATH=["src/"])
+# Recursively add all subdirectories from the root as include paths
+include_dirs = []
+for root, dirs, files in os.walk("."):
+    # Filter out hidden/system folders (like .git, .vs, etc.)
+    dirs[:] = [d for d in dirs if not d.startswith('.')]
+    for d in dirs:
+        full_path = os.path.join(root, d).replace("\\", "/")
+        if os.path.isdir(full_path):
+            include_dirs.append(full_path)
+env.Append(CPPPATH=include_dirs)
+
+#env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
 
 if env["platform"] == "macos":
