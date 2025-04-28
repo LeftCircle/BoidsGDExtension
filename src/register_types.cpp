@@ -9,6 +9,7 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/core/class_db.hpp>
 
 
 using namespace godot;
@@ -24,7 +25,7 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level) {
 	// Can also use if (Engine->get_singleton()->is_editor_hint()) to isolate editor code.
 	//GDREGISTER_RUNTIME_CLASS(Player);
 	GDREGISTER_RUNTIME_CLASS(GDExample);
-	GDREGISTER_RUNTIME_CLASS(Boids);
+	//GDREGISTER_RUNTIME_CLASS(Boids);
 	GDREGISTER_RUNTIME_CLASS(BoidOOP);
 	GDREGISTER_RUNTIME_CLASS(BoidSystem);
 

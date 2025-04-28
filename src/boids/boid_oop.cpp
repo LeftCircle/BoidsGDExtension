@@ -40,23 +40,52 @@ BoidOOP::BoidOOP() {
 	boid_system->register_boid(*this);
 
 }
-BoidOOP::~BoidOOP() {}
+BoidOOP::~BoidOOP() {
+	Ref<BoidSystem> boid_system = Ref<BoidSystem>(Engine::get_singleton()->get_singleton("BoidSystem"));
+	boid_system->unregister_boid(*this);
+}
 
 
-const std::vector<const BoidOOP*> BoidOOP::find_neighbors(const std::vector<BoidOOP> &boids) const {
+const std::vector<const BoidOOP*> BoidOOP::find_neighbors(const std::vector<BoidOOP*>& boids) const {
 	std::vector<const BoidOOP*> neighbors;
 	int n_boids = boids.size();
 	for (int i = 0; i < n_boids; ++i) {
-		const BoidOOP& other = boids[i];
-		if (other.get_position() == position) continue;
-		float dist = position.distance_to(other.get_position());
+		const BoidOOP* other = boids[i];
+		if (other->get_position() == position) continue;
+		float dist = position.distance_to(other->get_position());
 		if (dist < neighbor_distance) {
-			neighbors.push_back(&boids[i]);
+			neighbors.push_back(boids[i]);
 		}
 	}
 	return neighbors;
 }
 
+
+void BoidOOP::update(float delta){
+	Ref<BoidSystem> boid_system = Ref<BoidSystem>(Engine::get_singleton()->get_singleton("BoidSystem"));
+	const std::vector<BoidOOP*>& boids = boid_system->get_boid_oops();
+	const std::vector<const BoidOOP*> neighbors = find_neighbors(boids);
+	Vector3 separation, alignment, cohesion;
+	int neighbor_count = 0;
+	for (const BoidOOP* other : neighbors) {
+		if (other == this) continue;
+		float dist = position.distance_to(other->get_position());
+		separation += (position - other->get_position()) / (dist + 0.01f);
+		alignment += other->get_velocity();
+		cohesion += other->get_position();
+		neighbor_count++;
+	}
+	if (neighbor_count > 0) {
+		separation = separation / neighbor_count * separation_weight;
+		alignment = (alignment / neighbor_count - velocity) * alignment_weight;
+		cohesion = ((cohesion / neighbor_count) - position) * cohesion_weight;
+		velocity += separation + alignment + cohesion;
+	}
+	if (velocity.length() > max_speed) {
+		velocity = velocity.normalized() * max_speed;
+	}
+	position += velocity * (float)delta;
+}
 
 void BoidOOP::set_position(const Vector3 &p_position) {
 	position = p_position;

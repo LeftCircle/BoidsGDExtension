@@ -48,8 +48,8 @@ public:
 	float get_cohesion_weight() const;
 
 
-	const std::vector<const BoidOOP*> find_neighbors(const std::vector<BoidOOP> &boids) const;
-	void update(double delta);
+	const std::vector<const BoidOOP*> find_neighbors(const std::vector<BoidOOP*> &boids) const;
+	void update(float delta);
 
 	void set_boid_count(int count);
 	int get_boid_count() const;

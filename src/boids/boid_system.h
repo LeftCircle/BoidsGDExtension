@@ -17,7 +17,7 @@ protected:
 	static void _bind_methods();
 
 private:
-	std::vector<BoidOOP> boid_oops;
+	std::vector<BoidOOP*> boid_oops;
 
 public:
 	BoidSystem();
@@ -30,5 +30,6 @@ public:
 	void unregister_boid(BoidOOP &boid);
 
 	void update_boids_oop(double delta);
+	const std::vector<BoidOOP*>& get_boid_oops() const { return boid_oops; }
 };
 } // namespace godot
